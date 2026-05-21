@@ -46,7 +46,7 @@ int main() {
                 raiz_huffman = construirArvoreHuffman(fila);
                 
                 printf("\nEstrutura da Arvore:\n");
-                imprimirArvore(raiz_huffman);
+                imprimirArvore(raiz_huffman, 0);
                 printf("\n");
                 char caminho[256];
                 gerarDicionario(dicionario, raiz_huffman, caminho, 0);

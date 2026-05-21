@@ -13,7 +13,7 @@ int compararNos(void* A, void* B);
 int* lerCaracteres(char* nome);
 Fila* popularFila(int* tabelaFrequencia, int capacidadeMax, int (*comparaElementos)(void*, void*));
 No* construirArvoreHuffman(Fila* fila);
-void imprimirArvore(No* raiz);
+void imprimirArvore(No* raiz, int nivel);
 void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int nivel);
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]);
 void descompactarArquivo(No* raiz, char* arquivoEntrada, char* arquivoSaida);

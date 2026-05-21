@@ -8,10 +8,8 @@
 int compararNos(void* A, void* B){
     No* noA = (No*) A;
     No* noB = (No*) B;
-    if(noA->frequencia < noB->frequencia){
-        return 1;
-    }
-    return 0;
+
+    return noA->frequencia - noB->frequencia;
 }
 int* lerCaracteres(char* nome){
     FILE* arquivo = fopen(nome, "r");
@@ -53,18 +51,19 @@ No* construirArvoreHuffman(Fila* fila){
     No* ultimo = (No*) removerFila(fila);
     return ultimo;
 }
-void imprimirArvore(No* raiz){
+void imprimirArvore(No* raiz, int nivel){
     if(raiz == NULL){
         return;
     }
-    if(raiz->esq == NULL && raiz->dir == NULL){
-        printf("[%c : %d]", raiz->codigo, raiz->frequencia);
+    imprimirArvore(raiz->dir, nivel + 1);
+    
+    for(int i =0; i < nivel; i++){
+        printf("   ");
     }
-    else{
-        printf("[%d]", raiz->frequencia);
-    }
-    imprimirArvore(raiz->esq);
-    imprimirArvore(raiz->dir);
+
+    printf("%c - %d\n", raiz->codigo, raiz->frequencia);
+
+    imprimirArvore(raiz->esq, nivel + 1);
 }
 void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int nivel){
     if(raiz == NULL){
@@ -82,8 +81,12 @@ void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int niv
     }
 }
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]){
-    FILE* entrada = fopen(arquivoEntrada, "r");
+    FILE* entrada = fopen(arquivoEntrada, "rb");
     FILE* saida = fopen(arquivoSaida, "wb");
+
+    int frequencias[256];
+    fwrite(frequencias, sizeof(int), 256, saida);
+
     if(entrada == NULL || saida == NULL){
         printf("Erro ao abrir os arquivos!\n");
         return;
@@ -120,12 +123,19 @@ void descompactarArquivo(No* raiz, char* arquivoEntrada, char* arquivoSaida){
         printf("ERROR");
         return;
     }
+
+    int frequencias [256];
+    fread(frequencias, sizeof(int),256, entrada);
+
+    Fila *fila = criarFila(256,compararNos(void *a, void *b));
+
+    No *arvore = construirArvoreHuffman();
     No* atual = raiz;
     unsigned char byte;
     while(fread(&byte, sizeof(unsigned char), 1 , entrada) == 1){
         for(int i = 7 ; i >= 0; i--){
-            int bit = (byte >> i) & 1;
-            if(bit == 0){
+            int byte = (byte >> i) & 1;
+            if(byte == 0){
                 atual = atual->esq;
             }
             else{
