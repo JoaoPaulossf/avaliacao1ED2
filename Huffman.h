@@ -9,12 +9,22 @@ typedef struct NoHuffman{
     struct NoHuffman* esq;
     struct NoHuffman* dir;
 }No;
+
 int compararNos(void* A, void* B);
+
 int* lerCaracteres(char* nome);
-Fila* popularFila(int* tabelaFrequencia, int capacidadeMax, int (*comparaElementos)(void*, void*));
+
+Fila* popularFila(int* tabelaFrequencia, int capacidadeMax);
+
 No* construirArvoreHuffman(Fila* fila);
+
 void imprimirArvore(No* raiz, int nivel);
+
+void imprimirTabela(int *tabelaFrequencias);
+
 void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int nivel);
+
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]);
-void descompactarArquivo(No* raiz, char* arquivoEntrada, char* arquivoSaida);
+
+void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida);
 #endif

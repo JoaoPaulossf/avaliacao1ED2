@@ -5,12 +5,7 @@
 #include "Huffman.h"
 #include "heap.h"
 
-int compararNos(void* A, void* B){
-    No* noA = (No*) A;
-    No* noB = (No*) B;
-
-    return noA->frequencia - noB->frequencia;
-}
+//função para pré-processamento dos caracteres, necessário para construir a arvore huffman
 int* lerCaracteres(char* nome){
     FILE* arquivo = fopen(nome, "r");
     if(arquivo == NULL)
@@ -23,8 +18,18 @@ int* lerCaracteres(char* nome){
     fclose(arquivo);
     return tabelaFrequencia;
 }
-Fila* popularFila(int* tabelaFrequencia, int capacidadeMax, int (*comparaElementos)(void*, void*)){
-    Fila* fila = criarFila(capacidadeMax, comparaElementos);
+
+void imprimirTabela(int *tabelaFrequencia){
+    for(int i = 0; i < 256; i++){
+        if(tabelaFrequencia[i] > 0){
+            printf("%c -> %d\n" ,i , tabelaFrequencia[i]);
+        }
+    }
+}
+
+//função para colocar os elementos pré-processados na fila de prioridade
+Fila* popularFila(int* tabelaFrequencia, int capacidadeMax){
+    Fila* fila = criarFila(capacidadeMax);
     for(int i = 0; i < 256; i++){
         if(tabelaFrequencia[i] > 0){
             No* caractere = malloc(sizeof(No));
@@ -37,10 +42,12 @@ Fila* popularFila(int* tabelaFrequencia, int capacidadeMax, int (*comparaElement
     }
     return fila;
 }
+
+
 No* construirArvoreHuffman(Fila* fila){
     while(fila->tamanhoAtual >1){
-        No* caractere1 = (No*) removerFila(fila);
-        No* caractere2 = (No*) removerFila(fila);
+        No* caractere1 = removerFila(fila);
+        No* caractere2 = removerFila(fila);
         No* pai = malloc(sizeof(No));
         pai->codigo = '+';
         pai->frequencia = caractere1->frequencia + caractere2->frequencia;
@@ -51,6 +58,7 @@ No* construirArvoreHuffman(Fila* fila){
     No* ultimo = (No*) removerFila(fila);
     return ultimo;
 }
+
 void imprimirArvore(No* raiz, int nivel){
     if(raiz == NULL){
         return;
@@ -65,6 +73,8 @@ void imprimirArvore(No* raiz, int nivel){
 
     imprimirArvore(raiz->esq, nivel + 1);
 }
+
+//função que vai gerar os codigos para cada caracter
 void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int nivel){
     if(raiz == NULL){
         return;
@@ -80,20 +90,28 @@ void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int niv
         gerarDicionario(dicionario, raiz->dir, caminho, nivel + 1);
     }
 }
+
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]){
     FILE* entrada = fopen(arquivoEntrada, "rb");
     FILE* saida = fopen(arquivoSaida, "wb");
-
-    int frequencias[256];
-    fwrite(frequencias, sizeof(int), 256, saida);
 
     if(entrada == NULL || saida == NULL){
         printf("Erro ao abrir os arquivos!\n");
         return;
     }
-    unsigned char byte = 0;
-    int contador = 0;
+
+    int frequencias[256] = {0};
     int c;
+
+    while((c = fgetc(entrada)) != EOF){
+        frequencias[c]++;
+    }
+    rewind(entrada);
+    fwrite(frequencias, sizeof(int), 256, saida);
+
+    unsigned char byte = 0;
+
+    int contador = 0;
     while((c = fgetc(entrada)) != EOF){
         char* codigo = dicionario[c];
         for(int i = 0; codigo[i] != '\0'; i++){
@@ -116,26 +134,44 @@ void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[
     fclose(entrada);
     fclose(saida);
 }
-void descompactarArquivo(No* raiz, char* arquivoEntrada, char* arquivoSaida){
+
+void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
     FILE* entrada = fopen(arquivoEntrada, "rb");
-    FILE* saida = fopen(arquivoSaida, "w"); 
+    FILE* saida = fopen(arquivoSaida, "wb"); 
     if(entrada == NULL || saida == NULL){
-        printf("ERROR");
+        printf("ERROR\n");
         return;
     }
 
     int frequencias [256];
     fread(frequencias, sizeof(int),256, entrada);
 
-    Fila *fila = criarFila(256,compararNos(void *a, void *b));
+    Fila *fila = criarFila(256);
+    for(int i = 0; i < 256; i++){
+        if(frequencias[i] > 0){
+            No *novo = malloc(sizeof(No));
+            novo->frequencia = frequencias[i];
+            novo->codigo = i;
+            novo->dir = NULL;
+            novo->esq = NULL;
+            inserirFila(fila, novo);
+        }
+    }
+    No *raiz = construirArvoreHuffman(fila);
+    int totalCaracteres = 0;
+    for(int i = 0; i < 256; i++){
+        totalCaracteres += frequencias[i];
+    }
 
-    No *arvore = construirArvoreHuffman();
-    No* atual = raiz;
+    No *atual = raiz;
+
     unsigned char byte;
-    while(fread(&byte, sizeof(unsigned char), 1 , entrada) == 1){
+
+    int decodificados = 0;
+    while(fread(&byte, sizeof(unsigned char), 1 , entrada) == 1 && decodificados < totalCaracteres){
         for(int i = 7 ; i >= 0; i--){
-            int byte = (byte >> i) & 1;
-            if(byte == 0){
+            int bit = (byte >> i) & 1;
+            if(bit == 0){
                 atual = atual->esq;
             }
             else{
@@ -143,7 +179,10 @@ void descompactarArquivo(No* raiz, char* arquivoEntrada, char* arquivoSaida){
             }
             if(atual->esq == NULL && atual->dir == NULL){
                 fputc(atual->codigo, saida);
+                decodificados++;
                 atual = raiz;
+
+                if(decodificados == totalCaracteres) break;
             }
         }
     }

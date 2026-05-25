@@ -31,18 +31,21 @@ int main() {
                 scanf("%s", nomeArquivoSaida);
                 printf("Nome salvo para operacoes!\n");
                 break;
+        
             case 2:
                 tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
                 if (tabela_frequencia != NULL) {
+                    imprimirTabela(tabela_frequencia);
                     printf("Frequencias calculadas com sucesso!\n");
                 }
                 break;
+            
             case 3:
                 if (tabela_frequencia == NULL) {
                     printf("Erro: Calcule as frequencias primeiro (Opcao 2)!\n");
                     break;
                 }
-                fila = popularFila(tabela_frequencia, 256, compararNos);
+                fila = popularFila(tabela_frequencia, 256);
                 raiz_huffman = construirArvoreHuffman(fila);
                 
                 printf("\nEstrutura da Arvore:\n");
@@ -51,6 +54,7 @@ int main() {
                 char caminho[256];
                 gerarDicionario(dicionario, raiz_huffman, caminho, 0);
                 break;
+            
             case 4:
                 if (raiz_huffman == NULL) {
                     printf("Erro: Construa a arvore primeiro (Opcao 3)!\n");
@@ -60,18 +64,19 @@ int main() {
                 compactarArquivo(nomeArquivoEntrada, "saida.comp", dicionario);
                 printf("Arquivo saida.comp gerado!\n");
                 break;
+            
             case 5:
-                if (raiz_huffman == NULL) {
-                    printf("Erro: A arvore precisa estar na memoria para descompactar!\n");
-                    break;
-                }
+                printf("Digite o nome do arquivo a ser descompactado:");
+                scanf("%s", nomeArquivoEntrada);
                 printf("Descompactando...\n");
-                descompactarArquivo(raiz_huffman, "saida.comp", "restaurado.txt");
+                descompactarArquivo(nomeArquivoEntrada, "restaurado.txt");
                 printf("Arquivo restaurado.txt gerado com sucesso!\n");
                 break;
+        
             case 6:
                 printf("Encerrando o programa...\n");
                 break;
+        
             default:
                 printf("Opcao invalida!\n");
         }
