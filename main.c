@@ -4,14 +4,15 @@
 
 int main() {
     int opcao = 0;
+    int menu = 1;
     char nomeArquivoEntrada[100];
     char nomeArquivoSaida[100];
     int* tabela_frequencia = NULL;
     Fila* fila = NULL;
     No* raiz_huffman = NULL;
     char dicionario[256][256] = {0};
-
-    while (opcao != 6) {
+    
+    while (menu == 1) {
         printf("\nBem vindo ao Compactador CEUNES\n");
         printf("1. Ler arquivo texto\n");
         printf("2. Contar ocorrencias (Frequencia)\n");
@@ -20,8 +21,11 @@ int main() {
         printf("5. Descompactar Arquivo\n");
         printf("6. Sair\n");
         printf("Escolha uma opcao: ");
-        scanf("%d", &opcao);
-
+        if(scanf("%d", &opcao) != 1){
+            opcao = 7;
+            while (getchar() != '\n');
+            continue;
+        }
         switch (opcao) {
             case 1:
                 printf("Digite o nome do arquivo .txt: ");
@@ -75,6 +79,7 @@ int main() {
         
             case 6:
                 printf("Encerrando o programa...\n");
+                menu = 2;
                 break;
         
             default:
