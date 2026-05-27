@@ -14,9 +14,10 @@ int compararNos(void* A, void* B){
 //função para pré-processamento dos caracteres, necessário para construir a arvore huffman
 int* lerCaracteres(char* nome){
     FILE* arquivo = fopen(nome, "r");
-    if(arquivo == NULL)
+    if(arquivo == NULL){
         printf("Erro: não  foi possivel abrir o arquivo '%s'!!!\n", nome);
         return NULL;
+    }
     int* tabelaFrequencia = calloc(256, sizeof(int));
     int c;
     while((c = fgetc(arquivo))!= EOF){

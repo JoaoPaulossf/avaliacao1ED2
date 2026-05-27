@@ -30,11 +30,11 @@ void subirElemento(Fila* fila, int i, int(*comparar)(void*, void*)){
     }
 }
 
-No* removerFila(Fila* fila, int(*comparar)(void*, void*)){
+void* removerFila(Fila* fila, int(*comparar)(void*, void*)){
     if(fila->tamanhoAtual == 0){
         return NULL;
     }
-    No* temp = fila->elementos[0];
+    void* temp = fila->elementos[0];
     fila->elementos[0] = fila->elementos[fila->tamanhoAtual-1];
     fila->tamanhoAtual--;
     descerElemento(fila, 0, comparar);
