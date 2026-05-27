@@ -5,10 +5,17 @@
 #include "Huffman.h"
 #include "heap.h"
 
+int compararNos(void* A, void* B){
+    No* noA = (No*) A;
+    No* noB = (No*) B;
+    return noA->frequencia < noB->frequencia;
+}
+
 //função para pré-processamento dos caracteres, necessário para construir a arvore huffman
 int* lerCaracteres(char* nome){
     FILE* arquivo = fopen(nome, "r");
     if(arquivo == NULL)
+        printf("Erro: não  foi possivel abrir o arquivo '%s'!!!\n", nome);
         return NULL;
     int* tabelaFrequencia = calloc(256, sizeof(int));
     int c;
@@ -37,7 +44,7 @@ Fila* popularFila(int* tabelaFrequencia, int capacidadeMax){
             caractere->frequencia = tabelaFrequencia[i];
             caractere->esq = NULL;
             caractere->dir = NULL;
-            inserirFila(fila, caractere);
+            inserirFila(fila, caractere, compararNos);
         }
     }
     return fila;
@@ -46,16 +53,16 @@ Fila* popularFila(int* tabelaFrequencia, int capacidadeMax){
 
 No* construirArvoreHuffman(Fila* fila){
     while(fila->tamanhoAtual >1){
-        No* caractere1 = removerFila(fila);
-        No* caractere2 = removerFila(fila);
+        No* caractere1 = removerFila(fila, compararNos);
+        No* caractere2 = removerFila(fila, compararNos);
         No* pai = malloc(sizeof(No));
         pai->codigo = '+';
         pai->frequencia = caractere1->frequencia + caractere2->frequencia;
         pai->esq = caractere1;
         pai->dir = caractere2;
-        inserirFila(fila, pai);
+        inserirFila(fila, pai, compararNos);
     }
-    No* ultimo = (No*) removerFila(fila);
+    No* ultimo = (No*) removerFila(fila, compararNos);
     return ultimo;
 }
 
@@ -93,10 +100,14 @@ void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int niv
 
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]){
     FILE* entrada = fopen(arquivoEntrada, "rb");
-    FILE* saida = fopen(arquivoSaida, "wb");
+    if(entrada == NULL){
+        printf("Erro ao abrir o arquivo de entrada!!!\n");
+        return;
+    }
 
-    if(entrada == NULL || saida == NULL){
-        printf("Erro ao abrir os arquivos!\n");
+    FILE* saida = fopen(arquivoSaida, "wb");
+    if(saida == NULL){
+        printf("Erro ao abrir o arquivo de saida!!!\n");
         return;
     }
 
@@ -137,9 +148,14 @@ void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[
 
 void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
     FILE* entrada = fopen(arquivoEntrada, "rb");
+    if(entrada == NULL){
+        printf("Erro ao abrir o arquivo de entrada!!!\n");
+        return;
+    }
+
     FILE* saida = fopen(arquivoSaida, "wb"); 
-    if(entrada == NULL || saida == NULL){
-        printf("ERROR\n");
+    if(saida == NULL){
+        printf("Erro ao abrir o arquivo de saida!!!\n");
         return;
     }
 
@@ -154,7 +170,7 @@ void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
             novo->codigo = i;
             novo->dir = NULL;
             novo->esq = NULL;
-            inserirFila(fila, novo);
+            inserirFila(fila, novo, compararNos);
         }
     }
     No *raiz = construirArvoreHuffman(fila);

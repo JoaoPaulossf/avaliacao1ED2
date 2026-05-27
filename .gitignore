@@ -1,6 +1,5 @@
-loremipsum.txt
-.comp
-.exe
-.out
-.txt
-compilador
+*.txt
+*.o
+*.comp
+*.exe
+*.out
