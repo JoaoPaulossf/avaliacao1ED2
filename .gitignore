@@ -1,6 +1,7 @@
-loremipsum.txt
-.comp
-.exe
-.out
-.txt
+*.txt
+*.o
+*.comp
+*.exe
+*.out
+*.json
 compilador

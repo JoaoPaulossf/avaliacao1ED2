@@ -11,15 +11,15 @@ int main() {
     Fila* fila = NULL;
     No* raiz_huffman = NULL;
     char dicionario[256][256] = {0};
-    
+
+    printf("\nBem vindo ao Compactador CEUNES\n");
     while (menu == 1) {
-        printf("\nBem vindo ao Compactador CEUNES\n");
-        printf("1. Ler arquivo texto\n");
-        printf("2. Contar ocorrencias (Frequencia)\n");
-        printf("3. Construir e Imprimir Arvore\n");
-        printf("4. Compactar Arquivo\n");
-        printf("5. Descompactar Arquivo\n");
-        printf("6. Sair\n");
+        printf("______MENU______\n");    
+        printf("1. Comprimir Arquivo\n");
+        printf("2. Exibir contagem de ocorrencias(Frequencia)\n");
+        printf("3. Imprimir Arvore do codigo de huffman\n");
+        printf("4. Descompactar Arquivo\n");
+        printf("5. Sair\n");
         printf("Escolha uma opcao: ");
         if(scanf("%d", &opcao) != 1){
             opcao = 7;
@@ -30,46 +30,49 @@ int main() {
             case 1:
                 printf("Digite o nome do arquivo .txt: ");
                 scanf("%s", nomeArquivoEntrada);
-                printf("Arquivo selecionado para operacoes!\n");
+
                 printf("Digite o nome do arquivo de saida: ");
                 scanf("%s", nomeArquivoSaida);
-                printf("Nome salvo para operacoes!\n");
-                break;
-        
-            case 2:
-                tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
-                if (tabela_frequencia != NULL) {
-                    imprimirTabela(tabela_frequencia);
-                    printf("Frequencias calculadas com sucesso!\n");
-                }
-                break;
             
-            case 3:
-                if (tabela_frequencia == NULL) {
-                    printf("Erro: Calcule as frequencias primeiro (Opcao 2)!\n");
+                tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
+
+                if(tabela_frequencia == NULL){
+                    printf("Erro: não  foi possivel gerar a tabela de frequencias!!!\n");
                     break;
                 }
+
                 fila = popularFila(tabela_frequencia, 256);
+
                 raiz_huffman = construirArvoreHuffman(fila);
-                
+
+                char caminho[256];
+
+                gerarDicionario(dicionario, raiz_huffman, caminho, 0);
+
+                printf("Compactando...\n");
+
+                compactarArquivo(nomeArquivoEntrada, "saida.comp", dicionario);
+
+                printf("Arquivo saida.comp gerado!\n");
+
+                break;
+            case 2:
+                if (tabela_frequencia != NULL) {
+                    imprimirTabela(tabela_frequencia);
+                }else{ 
+                    printf("Primeiro precisa comprimir um arquivo para exibir uma tabela de frequencias!!!\n");
+                }
+                break;
+            case 3:
+                if (raiz_huffman == NULL) {
+                    printf("ERRO: Primeiro precisa comprimir um arquivo para exibir a arvore gerada pelo codigo huffman!!!\n");
+                    break;
+                }
                 printf("\nEstrutura da Arvore:\n");
                 imprimirArvore(raiz_huffman, 0);
                 printf("\n");
-                char caminho[256];
-                gerarDicionario(dicionario, raiz_huffman, caminho, 0);
                 break;
-            
             case 4:
-                if (raiz_huffman == NULL) {
-                    printf("Erro: Construa a arvore primeiro (Opcao 3)!\n");
-                    break;
-                }
-                printf("Compactando...\n");
-                compactarArquivo(nomeArquivoEntrada, "saida.comp", dicionario);
-                printf("Arquivo saida.comp gerado!\n");
-                break;
-            
-            case 5:
                 printf("Digite o nome do arquivo a ser descompactado:");
                 scanf("%s", nomeArquivoEntrada);
                 printf("Descompactando...\n");
@@ -77,11 +80,10 @@ int main() {
                 printf("Arquivo restaurado.txt gerado com sucesso!\n");
                 break;
         
-            case 6:
+            case 5:
                 printf("Encerrando o programa...\n");
                 menu = 2;
                 break;
-        
             default:
                 printf("Opcao invalida!\n");
         }
