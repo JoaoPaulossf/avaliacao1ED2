@@ -89,7 +89,7 @@ int main() {
                     break;
                 }
                 printf("\nEstrutura da Arvore:\n");
-                imprimirArvore(raiz_huffman, 0);
+                imprimirArvoreHorizontal(raiz_huffman);
                 printf("\n");
                 break;
             case 4:

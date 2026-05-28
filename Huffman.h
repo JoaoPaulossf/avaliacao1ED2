@@ -18,7 +18,9 @@ Fila* popularFila(int* tabelaFrequencia, int capacidadeMax);
 
 No* construirArvoreHuffman(Fila* fila);
 
-void imprimirArvore(No* raiz, int nivel);
+void imprimirArvore(No* raiz, int nivel, char *caminho, int direita);
+
+void imprimirArvoreHorizontal(No *arvore);
 
 void imprimirTabela(int *tabelaFrequencias);
 
