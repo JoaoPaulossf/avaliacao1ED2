@@ -60,12 +60,32 @@ int main() {
                 if (tabela_frequencia != NULL) {
                     imprimirTabela(tabela_frequencia);
                 }else{ 
-                    printf("Primeiro precisa comprimir um arquivo para exibir uma tabela de frequencias!!!\n");
+                    printf("ALERT: Você ainda não selecionou um arquivo para compressão.\n Qual arquivo deseja construir uma tabela de frequencia: ");
+                    scanf("%s", nomeArquivoEntrada);
+                    tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
+
+                    if(tabela_frequencia == NULL){
+                        printf("Erro: não  foi possivel gerar a tabela de frequencias!!!\n");
+                        break;
+                    }
+                    imprimirTabela(tabela_frequencia);
                 }
                 break;
             case 3:
                 if (raiz_huffman == NULL) {
-                    printf("ERRO: Primeiro precisa comprimir um arquivo para exibir a arvore gerada pelo codigo huffman!!!\n");
+                    printf("ALERT: Você ainda não selecionou um arquivo.\n Qual arquivo deseja construir a Arvore de Huffman: ");
+                    scanf("%s", nomeArquivoEntrada);
+                    tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
+
+                    if(tabela_frequencia == NULL){
+                        printf("Erro: não  foi possivel gerar a tabela de frequencias!!!\n");
+                        break;
+                    }
+                    fila = popularFila(tabela_frequencia, 256);
+                    raiz_huffman = construirArvoreHuffman(fila);
+                    printf("\nEstrutura da Arvore:\n");
+                    imprimirArvore(raiz_huffman, 0);
+                    printf("\n");
                     break;
                 }
                 printf("\nEstrutura da Arvore:\n");
