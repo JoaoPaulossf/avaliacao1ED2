@@ -5,6 +5,8 @@
 #include "Huffman.h"
 #include "heap.h"
 
+#define ESPACO 5
+
 int compararNos(void* A, void* B){
     No* noA = (No*) A;
     No* noB = (No*) B;
@@ -28,11 +30,18 @@ int* lerCaracteres(char* nome){
 }
 
 void imprimirTabela(int *tabelaFrequencia){
+    int contrabarra = 0;
     for(int i = 0; i < 256; i++){
         if(tabelaFrequencia[i] > 0){
-            printf("%c -> %d\n" ,i , tabelaFrequencia[i]);
+            contrabarra++;
+            printf("%c -> %d; " ,i , tabelaFrequencia[i]);
+            if(contrabarra % 5 == 0){
+                printf("\n");
+            }
+
         }
     }
+    printf("\n");
 }
 
 //função para colocar os elementos pré-processados na fila de prioridade
@@ -67,19 +76,73 @@ No* construirArvoreHuffman(Fila* fila){
     return ultimo;
 }
 
-void imprimirArvore(No* raiz, int nivel){
+void imprimirArvore(No* raiz, int nivel, char caminho[], int direita){
     if(raiz == NULL){
         return;
     }
-    imprimirArvore(raiz->dir, nivel + 1);
-    
-    for(int i =0; i < nivel; i++){
-        printf("   ");
+
+    nivel++;
+
+    imprimirArvore(raiz->dir, nivel, caminho, 1);
+
+    if(nivel >= 2){
+        caminho[nivel - 2] = 0;
+
+        if(direita){
+            caminho[nivel - 2] = 1;
+        }
     }
 
-    printf("%c - %d\n", raiz->codigo, raiz->frequencia);
+    if(raiz->esq && nivel >= 1){
+        caminho[nivel - 1] = 1;
+    }
 
-    imprimirArvore(raiz->esq, nivel + 1);
+    printf("\n");
+
+    for(int i = 0; i < nivel - 1; i++){
+
+        if(i == nivel - 2)
+            printf("+");
+
+        else if(caminho[i])
+            printf("|");
+
+        else
+            printf(" ");
+
+        for(int j = 1; j < ESPACO; j++){
+
+            if(i < nivel - 2)
+                printf(" ");
+
+            else
+                printf("-");
+        }
+    }
+
+    printf("%c:[%d]\n", raiz->codigo, raiz->frequencia);
+
+    for(int i = 0; i < nivel; i++){
+
+        if(caminho[i])
+            printf("|");
+        else
+            printf(" ");
+
+        for(int j = 1; j < ESPACO; j++){
+            printf(" ");
+        }
+    }
+
+    imprimirArvore(raiz->esq, nivel, caminho, 0);
+}
+
+void imprimirArvoreHorizontal(No* raiz){
+    char caminho[255] = {0};
+
+    imprimirArvore(raiz, 0, caminho, 0);
+
+    printf("\n");
 }
 
 //função que vai gerar os codigos para cada caracter
