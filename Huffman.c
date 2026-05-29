@@ -289,6 +289,9 @@ void liberarArvore(No*raiz){
 }
 
 void liberarFila(Fila* fila){
+
+    if(fila == NULL) return;
+    
     free(fila->elementos);
     free(fila);
 }

@@ -1,6 +1,7 @@
 //GRUPO 11 - Carlos Eduardo de Oliveira Moronari / João Paulo Santos de Freitas / Marcus Vinicius Sabec Santana
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "Huffman.h"
 
 int main() {
@@ -31,10 +32,12 @@ int main() {
             case 1:
                 printf("Digite o nome do arquivo .txt: ");
                 scanf("%s", nomeArquivoEntrada);
+                strcat(nomeArquivoEntrada,".txt");
 
                 printf("Digite o nome do arquivo de saida: ");
                 scanf("%s", nomeArquivoSaida);
-            
+                strcat(nomeArquivoSaida,".comp");
+
                 tabela_frequencia = lerCaracteres(nomeArquivoEntrada);
 
                 if(tabela_frequencia == NULL){
@@ -52,9 +55,9 @@ int main() {
 
                 printf("Compactando...\n");
 
-                compactarArquivo(nomeArquivoEntrada, "saida.comp", dicionario);
+                compactarArquivo(nomeArquivoEntrada, nomeArquivoSaida, dicionario);
 
-                printf("Arquivo saida.comp gerado!\n");
+                printf("Arquivo %s gerado!\n",nomeArquivoSaida);
 
                 break;
             case 2:
@@ -85,7 +88,7 @@ int main() {
                     fila = popularFila(tabela_frequencia, 256);
                     raiz_huffman = construirArvoreHuffman(fila);
                     printf("\nEstrutura da Arvore:\n");
-                    imprimirArvore(raiz_huffman, 0);
+                    imprimirArvoreHorizontal(raiz_huffman);
                     printf("\n");
                     break;
                 }
@@ -96,9 +99,15 @@ int main() {
             case 4:
                 printf("Digite o nome do arquivo a ser descompactado:");
                 scanf("%s", nomeArquivoEntrada);
+                strcat(nomeArquivoEntrada,".comp");
+
+                printf("Digite o nome do arquivo de saida:");
+                scanf("%s", nomeArquivoSaida);
+                strcat(nomeArquivoSaida,".txt");
+                
                 printf("Descompactando...\n");
-                descompactarArquivo(nomeArquivoEntrada, "restaurado.txt", &tabela_frequencia, &raiz_huffman);
-                printf("Arquivo restaurado.txt gerado com sucesso!\n");
+                descompactarArquivo(nomeArquivoEntrada, nomeArquivoSaida, &tabela_frequencia, &raiz_huffman);
+                printf("Arquivo %s gerado com sucesso!\n", nomeArquivoSaida);
                 break;
         
             case 5:
