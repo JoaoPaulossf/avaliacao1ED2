@@ -1,3 +1,4 @@
+//GRUPO 11 - Carlos Eduardo de Oliveira Moronari / João Paulo Santos de Freitas / Marcus Vinicius Sabec Santana
 #include <stdio.h>
 #include <stdlib.h>
 #include "Huffman.h"
