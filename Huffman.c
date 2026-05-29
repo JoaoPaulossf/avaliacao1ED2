@@ -173,6 +173,7 @@ void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[
     FILE* saida = fopen(arquivoSaida, "wb");
     if(saida == NULL){
         printf("Erro ao abrir o arquivo de saida!!!\n");
+        fclose(entrada);
         return;
     }
 
@@ -211,7 +212,7 @@ void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[
     fclose(saida);
 }
 
-void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
+void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida, int** tabelaFrequencias, No** raiz){
     FILE* entrada = fopen(arquivoEntrada, "rb");
     if(entrada == NULL){
         printf("Erro ao abrir o arquivo de entrada!!!\n");
@@ -221,30 +222,33 @@ void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
     FILE* saida = fopen(arquivoSaida, "wb"); 
     if(saida == NULL){
         printf("Erro ao abrir o arquivo de saida!!!\n");
+        fclose(entrada);
         return;
     }
-
-    int frequencias [256];
-    fread(frequencias, sizeof(int),256, entrada);
+    *tabelaFrequencias = calloc(256, sizeof(int)); 
+    fread(*tabelaFrequencias, sizeof(int),256, entrada);
 
     Fila *fila = criarFila(256);
     for(int i = 0; i < 256; i++){
-        if(frequencias[i] > 0){
+        if((*tabelaFrequencias)[i] > 0){
             No *novo = malloc(sizeof(No));
-            novo->frequencia = frequencias[i];
+            novo->frequencia = (*tabelaFrequencias)[i];
             novo->codigo = i;
             novo->dir = NULL;
             novo->esq = NULL;
             inserirFila(fila, novo, compararNos);
         }
     }
-    No *raiz = construirArvoreHuffman(fila);
+    *raiz = construirArvoreHuffman(fila);
+    if(*raiz == NULL){
+        printf("Erro ao reconstruir arvore\n");
+    }
     int totalCaracteres = 0;
     for(int i = 0; i < 256; i++){
-        totalCaracteres += frequencias[i];
+        totalCaracteres += (*tabelaFrequencias)[i];
     }
 
-    No *atual = raiz;
+    No *atual = *raiz;
 
     unsigned char byte;
 
@@ -261,12 +265,30 @@ void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida){
             if(atual->esq == NULL && atual->dir == NULL){
                 fputc(atual->codigo, saida);
                 decodificados++;
-                atual = raiz;
+                atual = *raiz;
 
                 if(decodificados == totalCaracteres) break;
             }
         }
     }
+    liberarFila(fila);
+
     fclose(entrada);
     fclose(saida);
+}
+
+void liberarArvore(No*raiz){
+    if(raiz == NULL){
+        return;
+    }
+    
+    liberarArvore(raiz->esq);
+    liberarArvore(raiz->dir);
+
+    free(raiz);
+}
+
+void liberarFila(Fila* fila){
+    free(fila->elementos);
+    free(fila);
 }

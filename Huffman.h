@@ -29,5 +29,10 @@ void gerarDicionario(char dicionario[256][256], No* raiz, char* caminho, int niv
 
 void compactarArquivo(char* arquivoEntrada, char* arquivoSaida, char dicionario[256][256]);
 
-void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida);
+void descompactarArquivo(char* arquivoEntrada, char* arquivoSaida, int** tabelaFrequencias, No **raiz);
+
+void liberarArvore(No *raiz);
+
+void liberarFila(Fila* fila);
+
 #endif
