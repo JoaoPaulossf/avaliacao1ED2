@@ -97,7 +97,7 @@ int main() {
                 printf("Digite o nome do arquivo a ser descompactado:");
                 scanf("%s", nomeArquivoEntrada);
                 printf("Descompactando...\n");
-                descompactarArquivo(nomeArquivoEntrada, "restaurado.txt");
+                descompactarArquivo(nomeArquivoEntrada, "restaurado.txt", &tabela_frequencia, &raiz_huffman);
                 printf("Arquivo restaurado.txt gerado com sucesso!\n");
                 break;
         
@@ -109,4 +109,7 @@ int main() {
                 printf("Opcao invalida!\n");
         }
     }
+    liberarArvore(raiz_huffman);
+    liberarFila(fila);
+    free(tabela_frequencia);
 }
